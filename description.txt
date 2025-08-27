@@ -1,0 +1,21 @@
+Transform your Terraria world into a living, interactive interface for your development workflow!
+
+DevCrystal TaskForge brings task management and AI agent interaction directly into your favorite sandbox game through MCP (Model Context Protocol) integration.
+
+🔮 Tasks become enchanted crystals in your inventory
+⚒️ Complete todos with magical completion rituals  
+🧙‍♂️ AI agents manifest as interactive NPCs
+⚡ Cast spells to trigger real development actions
+🏰 Project progress builds actual structures in your world
+
+Never leave your creative flow to check a todo list again - manage your entire development workflow while building castles and exploring caves!
+
+Features:
+• Task Crystals with priority-based rarity
+• Task Meteors for urgent new items
+• Agent NPCs with specialized personalities  
+• MCP spell system for task operations
+• Real-time development activity visualization
+• Team collaboration in shared worlds
+
+Part of the Madness Engineering ecosystem - where development interfaces break all conventional boundaries.

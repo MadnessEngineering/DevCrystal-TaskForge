@@ -1,0 +1,6 @@
+displayName = DevCrystal TaskForge
+author = Madness Engineering
+version = 0.1.0
+homepage = https://github.com/madness-engineering/devcrystal-taskforge
+description = Transform your Terraria world into a living interface for development workflows through MCP integration
+side = Both

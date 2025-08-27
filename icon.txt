@@ -1,0 +1,4 @@
+# Placeholder for icon.png
+# The mod icon should be an 80x80 PNG file
+# For now, this is a placeholder - you'll need to create an actual icon.png file
+# The icon should represent the crystal/task theme of the mod

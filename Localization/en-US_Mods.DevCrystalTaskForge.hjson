@@ -1,0 +1,51 @@
+{
+    Items: {
+        TaskCrystal: {
+            DisplayName: "Task Crystal"
+            Tooltip: "A crystallized task from your development workflow\nRight-click to complete the task"
+        }
+        
+        TaskForgeWand: {
+            DisplayName: "Task Forge Wand"
+            Tooltip: "Channels the power to forge new task crystals\nCast spells to create and manage development tasks"
+        }
+    }
+    
+    Commands: {
+        CreateTask: {
+            Description: "Creates a new task crystal with the specified description"
+            Usage: "/createtask [description] - Forge a new task crystal"
+        }
+        
+        ListTasks: {
+            Description: "Lists all task crystals in your inventory"
+            Usage: "/listtasks - Show your current task crystals"
+        }
+    }
+    
+    UI: {
+        TaskCreation: {
+            Title: "Forge New Task Crystal"
+            DescriptionLabel: "Task Description:"
+            PriorityLabel: "Priority:"
+            ProjectLabel: "Project:"
+            CreateButton: "Forge Crystal"
+            CancelButton: "Cancel"
+        }
+        
+        Priorities: {
+            Low: "Low"
+            Medium: "Medium" 
+            High: "High"
+            Urgent: "Urgent"
+            Critical: "Critical"
+        }
+    }
+    
+    Messages: {
+        TaskCompleted: "Task completed with crystal magic!"
+        TaskCreated: "New task crystal forged successfully!"
+        MCPConnectionFailed: "Failed to connect to MCP server"
+        MCPConnectionSuccess: "Connected to MCP server successfully"
+    }
+}
