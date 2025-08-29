@@ -4,6 +4,8 @@ using Terraria;
 using Terraria.ID;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Text;
+using System;
 using Newtonsoft.Json;
 using DevCrystalTaskForge.Common.Config;
 
@@ -38,11 +40,12 @@ namespace DevCrystalTaskForge
         }
     }
 
-    // Basic MCP client for communicating with task management servers
+    // Enhanced MCP client for communicating with Omnispindle task management server
     public class MCPClient : System.IDisposable
     {
         private HttpClient httpClient;
         private string baseUrl = "http://localhost:8000"; // Default MCP server URL
+        private bool isConnected = false;
 
         public MCPClient()
         {
@@ -68,8 +71,8 @@ namespace DevCrystalTaskForge
 
         private async void TestConnectionAsync()
         {
-            bool connected = await TestConnection();
-            if (connected)
+            isConnected = await TestConnection();
+            if (isConnected)
             {
                 DevCrystalTaskForge.Instance.Logger.Info("MCP server connection successful");
             }
@@ -92,9 +95,154 @@ namespace DevCrystalTaskForge
             }
         }
 
+        // Enhanced MCP Tool Methods
+        
+        public async Task<MCPResponse> AddTodo(string description, string project, string priority = "Medium")
+        {
+            if (!isConnected) return MCPResponse.Failure("Not connected to MCP server");
+            
+            try
+            {
+                var payload = new
+                {
+                    description = description,
+                    project = project,
+                    priority = priority,
+                    target_agent = "terraria_player"
+                };
+                
+                var json = JsonConvert.SerializeObject(payload);
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+                
+                var response = await httpClient.PostAsync($"{baseUrl}/api/todos", content);
+                var responseText = await response.Content.ReadAsStringAsync();
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonConvert.DeserializeObject<dynamic>(responseText);
+                    return MCPResponse.Success(result);
+                }
+                else
+                {
+                    return MCPResponse.Failure($"Server error: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                DevCrystalTaskForge.Instance.Logger.Error($"AddTodo failed: {ex.Message}");
+                return MCPResponse.Failure(ex.Message);
+            }
+        }
+        
+        public async Task<MCPResponse> MarkTodoComplete(string todoId, string comment = null)
+        {
+            if (!isConnected) return MCPResponse.Failure("Not connected to MCP server");
+            
+            try
+            {
+                var payload = new
+                {
+                    todo_id = todoId,
+                    comment = comment
+                };
+                
+                var json = JsonConvert.SerializeObject(payload);
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+                
+                var response = await httpClient.PutAsync($"{baseUrl}/api/todos/{todoId}/complete", content);
+                var responseText = await response.Content.ReadAsStringAsync();
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonConvert.DeserializeObject<dynamic>(responseText);
+                    return MCPResponse.Success(result);
+                }
+                else
+                {
+                    return MCPResponse.Failure($"Server error: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                DevCrystalTaskForge.Instance.Logger.Error($"MarkTodoComplete failed: {ex.Message}");
+                return MCPResponse.Failure(ex.Message);
+            }
+        }
+        
+        public async Task<MCPResponse> SearchTodos(string query, int limit = 20)
+        {
+            if (!isConnected) return MCPResponse.Failure("Not connected to MCP server");
+            
+            try
+            {
+                var encodedQuery = System.Web.HttpUtility.UrlEncode(query);
+                var response = await httpClient.GetAsync($"{baseUrl}/api/todos/search?query={encodedQuery}&limit={limit}");
+                var responseText = await response.Content.ReadAsStringAsync();
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonConvert.DeserializeObject<dynamic>(responseText);
+                    return MCPResponse.Success(result);
+                }
+                else
+                {
+                    return MCPResponse.Failure($"Server error: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                DevCrystalTaskForge.Instance.Logger.Error($"SearchTodos failed: {ex.Message}");
+                return MCPResponse.Failure(ex.Message);
+            }
+        }
+        
+        public async Task<MCPResponse> ListProjects()
+        {
+            if (!isConnected) return MCPResponse.Failure("Not connected to MCP server");
+            
+            try
+            {
+                var response = await httpClient.GetAsync($"{baseUrl}/api/projects");
+                var responseText = await response.Content.ReadAsStringAsync();
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonConvert.DeserializeObject<dynamic>(responseText);
+                    return MCPResponse.Success(result);
+                }
+                else
+                {
+                    return MCPResponse.Failure($"Server error: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                DevCrystalTaskForge.Instance.Logger.Error($"ListProjects failed: {ex.Message}");
+                return MCPResponse.Failure(ex.Message);
+            }
+        }
+
         public void Dispose()
         {
             httpClient?.Dispose();
+        }
+    }
+
+    // Response wrapper for MCP operations
+    public class MCPResponse
+    {
+        public bool Success { get; set; }
+        public dynamic Data { get; set; }
+        public string ErrorMessage { get; set; }
+
+        public static MCPResponse Success(dynamic data)
+        {
+            return new MCPResponse { Success = true, Data = data };
+        }
+
+        public static MCPResponse Failure(string error)
+        {
+            return new MCPResponse { Success = false, ErrorMessage = error };
         }
     }
 }
